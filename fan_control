@@ -1,0 +1,30 @@
+#! /usr/bin/bash
+#
+# Change fan speed according to CPU temparature.
+#
+# REQUIREMENT: Enable fan_control option of module thinkpad_acpi
+#   In file /etc/modprobe.d/thinkpad_acpi.conf, add following line
+#   options thinkpad_acpi fan_control = 1
+#
+
+PROC_DIR='/proc/acpi/ibm'
+THERMAL_FILE="${PROC_DIR}/thermal"
+FAN_FILE="${PROC_DIR}/fan"
+INTERVAL=15
+
+if [ -f $THERMAL_FILE ] && [ -f $FAN_FILE ];then
+
+	echo -n "watchdog ${INTERVAL}" > $FAN_FILE;
+	while : ;do
+		temparature=$(awk '{print $2}' $THERMAL_FILE);
+		if [ $temparature -gt 65 ];then
+			echo "level full-speed" > $FAN_FILE;
+		elif [ $temparature -gt 55 ];then
+			echo "level 7" > $FAN_FILE;
+		else
+			echo "level auto" > $FAN_FILE;
+		fi
+
+		sleep ${INTERVAL}
+	done
+fi
