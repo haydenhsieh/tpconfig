@@ -1,0 +1,59 @@
+#! /bin/bash
+#
+# For my Thinkpad T60 configuration
+# 
+
+function exit_if_fail
+{
+	if [ $1 -ne 0 ];then
+		exit $1
+	fi
+}
+
+# install packages
+packages="sysfsutils tp-smapi-dkms hdapsd git-core git-sh tig vim vim-scripts"
+sudo apt-get install $packages
+exit_if_fail $?
+
+# checkout config files
+work_dir="/tmp/workspace"
+mkdir $work_dir
+cd $work_dir
+git clone https://github.com/haydenhsieh/tpconfig.git
+exit_if_fail $?
+
+# Edit /etc/modules to insert modules on boot
+modules=(tp_smapi hdaps thinkpad_acpi)
+num_mods=${#modules[@]}
+for (( i=0; i < $num_mods; i++ ));do
+	echo "Add ${modules[$i]} to modules."
+	sudo sh -c "echo ${modules[$i]} >> /etc/modules"
+	exit_if_fail $?
+done
+
+# Replace sysfsutils configuration file
+echo "Replace /etc/sysfs.conf"
+sudo cp ${work_dir}/sysfs.conf /etc/sysfs.conf
+exit_if_fail $?
+
+# Install thinkpad_acpi modprobe config
+echo "Install /etc/modprobe.d/thinkpad_acpi.conf"
+sudo cp ${work_dir}/thinkpad_acpi.conf /etc/modprobe.d/
+exit_if_fail $?
+
+# Install fan_control script
+echo "Install /usr/local/bin/fan_control"
+sudo cp ${work_dir}/fan_control /usr/local/bin
+exit_if_fail $?
+
+# Replace gitconfig
+echo "Install ~/.gitconfig"
+cp ${work_dir}/gitconfig ~/.gitconfig
+exit_if_fail $?
+
+# Add fan_control to root's cronjob
+echo "Install cronjob"
+sudo crontab -l > /tmp/cronjob
+sudo sh -c "echo '@reboot /bin/bash /usr/local/bin/fan_control > /dev/null 2>&1' >> /tmp/cronjob"
+sudo crontab /tmp/cronjob
+sudo rm /tmp/cronjob
