@@ -11,7 +11,8 @@ function exit_if_fail
 }
 
 # install packages
-packages="sysfsutils tp-smapi-dkms hdapsd git-core git-sh tig vim vim-scripts"
+packages="sysfsutils tp-smapi-dkms hdapsd git-core git-sh tig vim vim-scripts ibus-chewing"
+sudo apt-get update
 sudo apt-get install $packages
 exit_if_fail $?
 
