@@ -1,0 +1,10 @@
+[user]
+	name = Hayden Hsieh
+	email = hayden@t60
+[alias]
+	st = status
+	ci = commit
+[color]
+	diff = auto
+	status = auto
+	branch = auto
