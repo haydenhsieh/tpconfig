@@ -32,7 +32,7 @@ for (( i=0; i < $num_mods; i++ ));do
 	exit_if_fail $?
 done
 
-cd /tmp/${work_dir}/tpconfig
+cd ${work_dir}/tpconfig
 # Replace sysfsutils configuration file
 echo "Replace /etc/sysfs.conf"
 sudo cp sysfs.conf /etc/sysfs.conf
